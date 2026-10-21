@@ -1,0 +1,68 @@
+# Siemens SINUMERIK 828D/840D sl – Siemens-mode basic 3-axis output – DRAFT, requires engineering review.
+# Only basic path words are used (G0/G1/G2/G3 with incremental I/J, G17, G71 metric, G90, G94, G40, G54..G57,
+# T/D tool selection, G4 F<seconds> dwell, M30). Native measuring/drilling cycles (CYCLE81/CYCLE83) are not
+# implemented: drilling is expanded to linear moves. M6 and coolant M-codes are machine-builder (PLC) defined.
+key: sinumerik-828d-basic
+version: "0.1.0-draft"
+name: SINUMERIK 828D basic mill (DRAFT)
+controller_family: SINUMERIK
+dialect: sinumerik
+description: Draft Siemens-mode program structure without native cycles. Not verified.
+file_extension: .MPF
+output_units: mm
+unit_words: {mm: G71, inch: G70}
+work_offsets: [G54, G55, G56, G57]
+length_comp_cancel_word: null
+dwell_value_word: F
+program:
+  start_delimiter: null
+  end_delimiter: null
+  number_template: null
+  name_comment: true
+  end_word: M30
+comments:
+  style: semicolon
+  uppercase: true
+  max_length: 120
+line_numbers:
+  enabled: true
+  prefix: N
+  start: 10
+  increment: 10
+  maximum: 999990
+precision:
+  linear: 3
+  arc_center: 3
+  feed: 0
+  spindle: 0
+  dwell: 2
+  leading_zero: true
+  trailing_decimal_point: false
+  strip_trailing_zeros: true
+tool_change:
+  sequence: ["T{tool} D1", "M6"]
+  length_comp: null           # D1 activates the tool offset with the tool call
+  tool_number_max: 32000
+spindle: {cw: M3, ccw: M4, stop: M5, template: "S{rpm} {dir}"}
+coolant: {flood: null, mist: null, air: null, through_spindle: null, stop: null}
+arcs: {enabled: true, format: IJK, full_circle_allowed: true, max_sweep_deg: 360}
+canned_cycles:
+  enabled: false
+  drill: null
+  drill_dwell: null
+  peck: null
+  chip_break: null
+  cancel: G0          # unused while cycles are disabled; must still be a declared word
+  retract_initial: null
+  retract_r_plane: null
+safety_words: [G17, G71, G40, G90, G94]
+header_blocks: ["{safety}", "{machine:program_start}", "{work_offset}"]
+footer_blocks: ["{coolant_off}", "{spindle_stop}", "{retract_clearance}", "{machine:end_parking}", "{program_end}"]
+supported_gcodes: [G0, G1, G2, G3, G4, G17, G40, G54, G55, G56, G57, G70, G71, G90, G91, G94]
+supported_mcodes: [M0, M1, M3, M4, M5, M6, M30]
+max_line_length: 512
+known_limitations:
+  - "DRAFT: not reviewed against SINUMERIK programming manuals for the installed software version; not machine tested."
+  - "Drilling cycles are expanded into G0/G1 moves; CYCLE81/CYCLE83 are not generated."
+  - "M6 and coolant M-codes are PLC/machine-builder defined and must be supplied in the machine configuration."
+documentation_refs: []

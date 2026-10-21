@@ -1,0 +1,134 @@
+# Catalogue seed. Manufacturer records are research targets for the Indian market: listing a manufacturer does
+# NOT mean any of its machines or controllers are supported. Machine models marked is_example are illustrative
+# values for software testing and are not real products.
+machine_manufacturers:
+  - {name: "Example Machines (illustrative, not a real product)", country: "", notes: "Fictional records used for software testing and demonstration."}
+  - {name: "Jyoti CNC Automation", country: India, website: "https://www.jyoti.co.in"}
+  - {name: "Bharat Fritz Werner (BFW)", country: India, website: "https://www.bfwindia.com"}
+  - {name: "Lakshmi Machine Works (LMW)", country: India, website: "https://www.lmwglobal.com"}
+  - {name: "Ace Micromatic", country: India, website: "https://www.acemicromatic.net"}
+  - {name: "HMT Machine Tools", country: India, website: "https://www.hmtmachinetools.com"}
+  - {name: "Haas Automation", country: USA, website: "https://www.haascnc.com"}
+  - {name: "DMG MORI", country: "Germany / Japan", website: "https://www.dmgmori.com"}
+  - {name: "Yamazaki Mazak", country: Japan, website: "https://www.mazak.com"}
+  - {name: "Makino", country: Japan, website: "https://www.makino.com"}
+  - {name: "Okuma", country: Japan, website: "https://www.okuma.com"}
+  - {name: "DN Solutions (formerly Doosan Machine Tools)", country: "South Korea", website: "https://www.dn-solutions.com"}
+
+controller_manufacturers:
+  - {name: Siemens, website: "https://www.siemens.com/sinumerik"}
+  - {name: FANUC, website: "https://www.fanuc.co.jp"}
+  - {name: Mitsubishi Electric, website: "https://www.mitsubishielectric.com/fa"}
+  - {name: HEIDENHAIN, website: "https://www.heidenhain.com"}
+  - {name: Haas Automation, website: "https://www.haascnc.com"}
+  - {name: Yamazaki Mazak, website: "https://www.mazak.com"}
+  - {name: Okuma, website: "https://www.okuma.com"}
+  - {name: LinuxCNC Project, website: "https://linuxcnc.org"}
+
+controller_models:
+  - {manufacturer: LinuxCNC Project, name: LinuxCNC, family: LinuxCNC, dialect_family: rs274ngc,
+     versions: [{version: "2.9", notes: "Postprocessor syntax reviewed against the public LinuxCNC 2.9 G-code reference."}]}
+  - {manufacturer: FANUC, name: "Series 0i-MF Plus", family: "FANUC 0i", dialect_family: fanuc-iso,
+     versions: [{version: "unspecified (example)", notes: "Placeholder: record the exact series/edition shown on the control before use."}]}
+  - {manufacturer: Siemens, name: "SINUMERIK 828D", family: SINUMERIK, dialect_family: sinumerik,
+     versions: [{version: "unspecified (example)", notes: "Placeholder: record the exact CNC software version before use."}]}
+  - {manufacturer: Siemens, name: "SINUMERIK 840D sl", family: SINUMERIK, dialect_family: sinumerik, versions: []}
+  - {manufacturer: Mitsubishi Electric, name: "M80", family: "Mitsubishi M8", dialect_family: mitsubishi, versions: []}
+  - {manufacturer: HEIDENHAIN, name: "TNC 640", family: "HEIDENHAIN TNC", dialect_family: heidenhain-klartext, versions: []}
+  - {manufacturer: Haas Automation, name: "Haas NGC", family: "Haas", dialect_family: haas, versions: []}
+  - {manufacturer: Yamazaki Mazak, name: "MAZATROL SmoothG", family: MAZATROL, dialect_family: mazatrol-eia, versions: []}
+  - {manufacturer: Okuma, name: "OSP-P300MA", family: "Okuma OSP", dialect_family: okuma-osp, versions: []}
+
+machine_models:
+  - manufacturer: "Example Machines (illustrative, not a real product)"
+    family: "EX-VMC"
+    model: "EX-VMC-500 (example)"
+    category: vmc
+    axis_count: 3
+    axes:
+      - {name: X, type: linear, direction: "+X: tool moves right relative to table", min: 0, max: 500}
+      - {name: Y, type: linear, direction: "+Y: tool moves away from operator", min: 0, max: 400}
+      - {name: Z, type: linear, direction: "+Z: spindle moves up", min: -400, max: 0}
+    travel_x_mm: 500
+    travel_y_mm: 400
+    travel_z_mm: 400
+    table_size: {x: 650, y: 400}
+    max_table_load_kg: 300
+    spindle_min_rpm: 60
+    spindle_max_rpm: 8000
+    spindle_power_kw: 7.5
+    spindle_taper: BT40
+    max_feed_mm_min: 10000
+    rapid_rate_mm_min: 24000
+    tool_changer: {type: "arm ATC", capacity: 20, max_tool_diameter_mm: 80, max_tool_length_mm: 250, max_tool_weight_kg: 7}
+    workholding_options: [vise, fixture_plate, custom]
+    probing_options: []
+    coolant_options: [flood, mist]
+    is_example: true
+    source: "Illustrative values for software testing. Not a real product; do not use for production."
+    verification_status: draft
+  - manufacturer: "Example Machines (illustrative, not a real product)"
+    family: "EX-TURN"
+    model: "EX-TURN-200 (example lathe)"
+    category: lathe
+    axis_count: 2
+    axes:
+      - {name: X, type: linear, direction: "diameter axis"}
+      - {name: Z, type: linear, direction: "spindle axis"}
+    spindle_max_rpm: 4000
+    spindle_power_kw: 11
+    is_example: true
+    source: "Illustrative lathe record to exercise machine-type handling. Turning CAM is not supported."
+    verification_status: draft
+
+machine_configurations:
+  - name: "EX-VMC-500 + LinuxCNC 2.9 (example)"
+    machine_model: "EX-VMC-500 (example)"
+    controller: {model: LinuxCNC, version: "2.9"}
+    postprocessor: {key: linuxcnc-mill-3axis, version: "1.0.0"}
+    supported_operations: [face, pocket, adaptive, contour, drill, helix]
+    supported_file_extensions: [.ngc]
+    tool_change_time_s: 8
+    machine_blocks: {}
+    known_limitations:
+      - "Example configuration: machine-specific parking, tool-change and coolant behaviour are not configured."
+    configuration_notes: "Fictional machine paired with a documented controller postprocessor for software testing."
+    source: "Example configuration created by the platform; not supplied by a machine owner."
+    source_type: example
+    verification_status: draft
+    is_example: true
+  - name: "EX-VMC-500 + FANUC 0i-MF Plus (example, draft post)"
+    machine_model: "EX-VMC-500 (example)"
+    controller: {model: "Series 0i-MF Plus", version: "unspecified (example)"}
+    postprocessor: {key: fanuc-0i-mf-iso, version: "0.1.0-draft"}
+    supported_operations: [face, pocket, adaptive, contour, drill, helix]
+    supported_file_extensions: [.nc]
+    tool_change_time_s: 6
+    machine_blocks: {}
+    known_limitations: ["Draft postprocessor; programs cannot be released until it is verified."]
+    source: "Example configuration; controller version not recorded."
+    source_type: example
+    verification_status: draft
+    is_example: true
+  - name: "EX-VMC-500 + SINUMERIK 828D (example, draft post)"
+    machine_model: "EX-VMC-500 (example)"
+    controller: {model: "SINUMERIK 828D", version: "unspecified (example)"}
+    postprocessor: {key: sinumerik-828d-basic, version: "0.1.0-draft"}
+    supported_operations: [face, pocket, adaptive, contour, drill, helix]
+    supported_file_extensions: [.MPF]
+    tool_change_time_s: 6
+    machine_blocks: {}
+    known_limitations: ["Draft postprocessor; drilling cycles expanded to linear moves."]
+    source: "Example configuration; controller version not recorded."
+    source_type: example
+    verification_status: draft
+    is_example: true
+
+postprocessors:
+  - {key: linuxcnc-mill-3axis, name: "LinuxCNC 3-axis mill", controller_family: LinuxCNC,
+     license: "Configuration authored for this platform (no third-party postprocessor code)",
+     compatible_controllers: [LinuxCNC], status: documented}
+  - {key: fanuc-0i-mf-iso, name: "FANUC 0i-MF ISO mill", controller_family: "FANUC 0i",
+     license: "Configuration authored for this platform", compatible_controllers: ["Series 0i-MF Plus"], status: draft}
+  - {key: sinumerik-828d-basic, name: "SINUMERIK 828D basic mill", controller_family: SINUMERIK,
+     license: "Configuration authored for this platform", compatible_controllers: ["SINUMERIK 828D", "SINUMERIK 840D sl"], status: draft}

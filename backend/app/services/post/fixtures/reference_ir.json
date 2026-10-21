@@ -1,0 +1,35 @@
+{
+  "format": "cnc-ir/1", "units": "mm", "wcs": "G54",
+  "engine": {"name": "reference-fixture", "version": "1"},
+  "stock": {"min": [0, 0, -20], "max": [60, 40, 0]},
+  "part_bbox": {"min": [0, 0, -20], "max": [60, 40, 0]},
+  "operations": [
+    {"id": "op-contour", "name": "Contour fixture", "op_type": "contour", "tool_number": 1, "tool_type": "flat_endmill",
+     "tool_diameter": 10, "length_offset": 1, "spindle_rpm": 7958, "spindle_dir": "cw", "coolant": "flood",
+     "clearance_z": 10, "safe_z": 3,
+     "moves": [
+       {"k": "rapid", "x": -5, "y": -5, "z": 10},
+       {"k": "rapid", "x": -5, "y": -5, "z": 3},
+       {"k": "linear", "x": -5, "y": -5, "z": -2, "f": 300},
+       {"k": "linear", "x": 60, "y": -5, "z": -2, "f": 955},
+       {"k": "arc_ccw", "x": 65, "y": 0, "z": -2, "i": 0, "j": 5, "f": 955},
+       {"k": "linear", "x": 65, "y": 40, "z": -2, "f": 955},
+       {"k": "arc_cw", "x": 65, "y": 40, "z": -2, "i": -5, "j": 0, "f": 955},
+       {"k": "linear", "x": 65.0004, "y": 40, "z": -2, "f": 955},
+       {"k": "rapid", "x": 65, "y": 40, "z": 10},
+       {"k": "rapid", "x": 20, "y": 20, "z": 10}
+     ]},
+    {"id": "op-drill", "name": "Drill fixture", "op_type": "drill", "tool_number": 5, "tool_type": "drill",
+     "tool_diameter": 6.6, "length_offset": 5, "spindle_rpm": 1929, "spindle_dir": "cw", "coolant": "flood",
+     "clearance_z": 10, "safe_z": 3,
+     "moves": [
+       {"k": "rapid", "x": 10, "y": 10, "z": 10},
+       {"k": "drill", "cycle": "drill", "x": 10, "y": 10, "z": -22, "r": 3, "f": 193, "retract": "initial"},
+       {"k": "drill", "cycle": "drill", "x": 50, "y": 10, "z": -22, "r": 3, "f": 193, "retract": "initial"},
+       {"k": "drill", "cycle": "peck", "x": 50, "y": 30, "z": -22, "r": 3, "q": 6, "f": 193, "retract": "r_plane"},
+       {"k": "drill", "cycle": "chip_break", "x": 10, "y": 30, "z": -10, "r": 3, "q": 4, "f": 193, "retract": "initial"},
+       {"k": "drill", "cycle": "drill_dwell", "x": 30, "y": 20, "z": -5, "r": 3, "p": 0.5, "f": 193, "retract": "initial"},
+       {"k": "rapid", "x": 30, "y": 20, "z": 10}
+     ]}
+  ]
+}

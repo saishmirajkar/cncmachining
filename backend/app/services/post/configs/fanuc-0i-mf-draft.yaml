@@ -1,0 +1,70 @@
+# FANUC 0i-MF style ISO milling output – DRAFT, requires engineering review.
+# The structure follows widely used FANUC ISO conventions (O-number, '%' tape delimiters, G43 Hnn, G98/G99 canned
+# cycles, G82 dwell P in ms, decimal point on axis words). It has NOT been checked against FANUC documentation for a
+# specific software series/edition nor against a machine. Coolant M-codes, the tool-change macro and reference
+# returns (e.g. G91 G28 Z0) are machine-builder defined and must come from the machine configuration.
+key: fanuc-0i-mf-iso
+version: "0.1.0-draft"
+name: FANUC 0i-MF ISO mill (DRAFT)
+controller_family: FANUC 0i
+dialect: fanuc-iso
+description: Draft FANUC-style ISO program structure. Not verified.
+file_extension: .nc
+output_units: mm
+program:
+  start_delimiter: "%"
+  end_delimiter: "%"
+  number_template: "O{number:04d}"
+  number_min: 1
+  number_max: 8999
+  name_comment: true
+  end_word: M30
+comments:
+  style: paren
+  uppercase: true
+  max_length: 48
+  allowed_pattern: "[A-Z0-9 .,:/_\\-+=#*]"
+line_numbers:
+  enabled: false
+precision:
+  linear: 3
+  arc_center: 3
+  feed: 0
+  spindle: 0
+  dwell: 3
+  leading_zero: true
+  trailing_decimal_point: true
+  strip_trailing_zeros: true
+tool_change:
+  sequence: ["T{tool} M6"]
+  length_comp: "G43 H{h}"
+  length_comp_with_first_z: true
+  tool_number_max: 99
+spindle: {cw: M3, ccw: M4, stop: M5, template: "S{rpm} {dir}"}
+coolant: {flood: null, mist: null, air: null, through_spindle: null, stop: null}   # machine-builder defined
+arcs: {enabled: true, format: IJK, full_circle_allowed: true, helical_allowed: false, max_sweep_deg: 360}  # helical interpolation is a control option: linearised unless confirmed
+canned_cycles:
+  enabled: true
+  drill: G81
+  drill_dwell: G82
+  peck: G83
+  chip_break: G73
+  cancel: G80
+  retract_initial: G98
+  retract_r_plane: G99
+  peck_word: Q
+  dwell_word: P
+  dwell_unit: ms
+  repeat_xy_only: true
+safety_words: [G17, G21, G40, G49, G80, G90, G94]
+header_blocks: ["{safety}", "{machine:program_start}", "{work_offset}"]
+footer_blocks: ["{coolant_off}", "{spindle_stop}", "{retract_clearance}", "{machine:end_parking}", "{program_end}"]
+supported_gcodes: [G0, G1, G2, G3, G4, G17, G20, G21, G28, G40, G43, G49, G53, G54, G55, G56, G57, G58, G59,
+                   G73, G80, G81, G82, G83, G90, G91, G94, G98, G99]
+supported_mcodes: [M0, M1, M3, M4, M5, M6, M30]
+max_line_length: null
+known_limitations:
+  - "DRAFT: not reviewed against FANUC documentation for the installed series/edition; not machine tested."
+  - "Coolant, tool-change macro and reference-return blocks must be supplied in the machine configuration."
+  - "Assumes metric input (G21) and that decimal-point programming is enabled (axis words carry a decimal point)."
+documentation_refs: []

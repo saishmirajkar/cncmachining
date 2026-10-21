@@ -1,0 +1,74 @@
+# LinuxCNC 2.9 – 3-axis milling, metric.
+# Every word used below is taken from the public LinuxCNC 2.9 G-code reference:
+#   https://linuxcnc.org/docs/2.9/html/gcode/g-code.html and .../gcode/m-code.html
+#   https://linuxcnc.org/docs/2.9/html/gcode/overview.html (comments, '%' delimiters, O-words are subroutine labels)
+# Status of this configuration is managed in the database (PostprocessorVersion / PostprocessorVerification).
+key: linuxcnc-mill-3axis
+version: "1.0.0"
+name: LinuxCNC 2.9 3-axis mill (metric)
+controller_family: LinuxCNC
+dialect: rs274ngc
+description: >
+  RS274/NGC output for the LinuxCNC interpreter. Canned drilling cycles G81/G82/G83/G73 with G98/G99 retract,
+  IJK arcs in incremental arc-distance mode (G91.1, the LinuxCNC default), tool-length offset with G43 Hn.
+file_extension: .ngc
+output_units: mm
+program:
+  start_delimiter: "%"
+  end_delimiter: "%"
+  number_template: null   # LinuxCNC O-words are subroutine labels, not program numbers
+  name_comment: true
+  end_word: M2
+comments:
+  style: paren
+  uppercase: false
+  max_length: 200
+line_numbers:
+  enabled: false
+precision:
+  linear: 3
+  arc_center: 4
+  feed: 1
+  spindle: 0
+  dwell: 3
+  leading_zero: true
+  trailing_decimal_point: false
+  strip_trailing_zeros: true
+tool_change:
+  sequence: ["T{tool} M6"]
+  length_comp: "G43 H{h}"
+  length_comp_with_first_z: true
+  tool_number_max: 99999
+spindle: {cw: M3, ccw: M4, stop: M5, template: "S{rpm} {dir}"}
+# M7/M8/M9 are interpreter-defined in LinuxCNC; the I/O wiring is machine specific (HAL) -> engine warns
+# unless the machine configuration confirms coolant codes.
+coolant: {flood: M8, mist: M7, air: null, through_spindle: null, stop: M9}
+arcs: {enabled: true, format: IJK, full_circle_allowed: true, max_sweep_deg: 360}
+canned_cycles:
+  enabled: true
+  drill: G81
+  drill_dwell: G82
+  peck: G83
+  chip_break: G73
+  cancel: G80
+  retract_initial: G98
+  retract_r_plane: G99
+  peck_word: Q
+  dwell_word: P
+  dwell_unit: s
+  repeat_xy_only: true
+safety_words: [G17, G21, G40, G49, G80, G90, G91.1, G94]
+header_blocks: ["{safety}", "{machine:program_start}", "{work_offset}"]
+footer_blocks: ["{coolant_off}", "{spindle_stop}", "{retract_clearance}", "{machine:end_parking}", "{length_comp_cancel}", "{program_end}"]
+supported_gcodes: [G0, G1, G2, G3, G4, G17, G20, G21, G28, G30, G40, G43, G49, G53, G54, G55, G56, G57, G58, G59,
+                   G73, G80, G81, G82, G83, G90, G91, G91.1, G94, G98, G99]
+supported_mcodes: [M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M30]
+max_line_length: 255
+known_limitations:
+  - "Cutter radius compensation (G41/G42) is not emitted; toolpaths are tool-centre paths from the CAM engine."
+  - "Tool-change behaviour of M6 depends on the machine's HAL/INI configuration (manual or ATC)."
+  - "Software-level fixture tests only; not executed on a LinuxCNC interpreter or machine in this environment."
+documentation_refs:
+  - https://linuxcnc.org/docs/2.9/html/gcode/g-code.html
+  - https://linuxcnc.org/docs/2.9/html/gcode/m-code.html
+  - https://linuxcnc.org/docs/2.9/html/gcode/overview.html

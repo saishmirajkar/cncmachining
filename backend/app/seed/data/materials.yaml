@@ -1,0 +1,168 @@
+# Material grades with GENERIC STARTING cutting data. These ranges are typical values of the kind published in
+# general machining handbooks; they are NOT tool-manufacturer recommendations and are labelled as such wherever
+# they are used. Replace them with the tool manufacturer's data for production.
+#   vc_m_min: [min, max] cutting speed for milling (m/min)
+#   fz_by_d: [[diameter_mm, feed_per_tooth_mm], ...] milling, interpolated linearly
+#   drill: {vc_m_min: [min, max], f_by_d: [[diameter_mm, feed_per_rev_mm], ...]}
+#   engagement: slot_ap_over_d (full-width slotting), side_ap_over_d, pocket_stepover_pct, adaptive_stepover_pct
+#   kc11 (N/mm^2) and mc: Kienzle specific cutting force, used only for an approximate power check.
+source: "Generic starting values (typical handbook ranges). Not manufacturer-verified."
+materials:
+  - family: aluminium_alloy
+    name: Wrought aluminium alloy
+    iso_group: N
+    grades:
+      - designation: "6061-T6"
+        standard: "ASTM B221 / EN AW-6061"
+        equivalents: ["IS 733 65032 (indicative)"]
+        condition: "T6"
+        hardness: "~95 HB"
+        density_kg_m3: 2700
+        kc11_n_mm2: 700
+        mc: 0.25
+        cutting_data:
+          carbide: {vc_m_min: [200, 400], fz_by_d: [[3, 0.02], [6, 0.04], [10, 0.06], [16, 0.08], [20, 0.10]],
+                    drill: {vc_m_min: [80, 150], f_by_d: [[3, 0.08], [6, 0.12], [10, 0.18], [16, 0.25]]}}
+          hss: {vc_m_min: [60, 100], fz_by_d: [[3, 0.015], [6, 0.03], [10, 0.045], [16, 0.06], [20, 0.07]],
+                drill: {vc_m_min: [40, 60], f_by_d: [[3, 0.05], [6, 0.10], [10, 0.15], [16, 0.20]]}}
+          engagement: {slot_ap_over_d: 0.5, side_ap_over_d: 1.0, pocket_stepover_pct: 45, adaptive_stepover_pct: 20}
+      - designation: "6082-T6"
+        standard: "EN AW-6082"
+        equivalents: ["IS 733 64430 (HE30, indicative)"]
+        condition: "T6"
+        hardness: "~95 HB"
+        density_kg_m3: 2700
+        kc11_n_mm2: 700
+        mc: 0.25
+        cutting_data:
+          carbide: {vc_m_min: [200, 400], fz_by_d: [[3, 0.02], [6, 0.04], [10, 0.06], [16, 0.08], [20, 0.10]],
+                    drill: {vc_m_min: [80, 150], f_by_d: [[3, 0.08], [6, 0.12], [10, 0.18], [16, 0.25]]}}
+          hss: {vc_m_min: [60, 100], fz_by_d: [[3, 0.015], [6, 0.03], [10, 0.045], [16, 0.06], [20, 0.07]],
+                drill: {vc_m_min: [40, 60], f_by_d: [[3, 0.05], [6, 0.10], [10, 0.15], [16, 0.20]]}}
+          engagement: {slot_ap_over_d: 0.5, side_ap_over_d: 1.0, pocket_stepover_pct: 45, adaptive_stepover_pct: 20}
+  - family: carbon_steel
+    name: Structural / carbon steel
+    iso_group: P
+    grades:
+      - designation: "IS 2062 E250"
+        standard: "IS 2062"
+        equivalents: ["S235/S275 class (indicative)"]
+        condition: "hot rolled"
+        hardness: "~120-160 HB"
+        density_kg_m3: 7850
+        kc11_n_mm2: 1500
+        mc: 0.25
+        cutting_data:
+          carbide: {vc_m_min: [120, 200], fz_by_d: [[3, 0.015], [6, 0.03], [10, 0.045], [16, 0.06], [20, 0.07]],
+                    drill: {vc_m_min: [70, 100], f_by_d: [[3, 0.05], [6, 0.10], [10, 0.15], [16, 0.22]]}}
+          hss: {vc_m_min: [20, 30], fz_by_d: [[3, 0.01], [6, 0.02], [10, 0.03], [16, 0.04], [20, 0.05]],
+                drill: {vc_m_min: [20, 30], f_by_d: [[3, 0.04], [6, 0.08], [10, 0.12], [16, 0.18]]}}
+          engagement: {slot_ap_over_d: 0.3, side_ap_over_d: 1.0, pocket_stepover_pct: 40, adaptive_stepover_pct: 12}
+      - designation: "C45 / EN8"
+        standard: "IS 1570 45C8 / BS 970 080M40"
+        equivalents: ["AISI 1045 (indicative)"]
+        condition: "normalised"
+        hardness: "~180-220 HB"
+        density_kg_m3: 7850
+        kc11_n_mm2: 1700
+        mc: 0.25
+        cutting_data:
+          carbide: {vc_m_min: [100, 160], fz_by_d: [[3, 0.012], [6, 0.025], [10, 0.04], [16, 0.055], [20, 0.065]],
+                    drill: {vc_m_min: [60, 90], f_by_d: [[3, 0.05], [6, 0.09], [10, 0.14], [16, 0.20]]}}
+          hss: {vc_m_min: [15, 25], fz_by_d: [[3, 0.01], [6, 0.018], [10, 0.028], [16, 0.035], [20, 0.04]],
+                drill: {vc_m_min: [15, 25], f_by_d: [[3, 0.04], [6, 0.07], [10, 0.11], [16, 0.16]]}}
+          engagement: {slot_ap_over_d: 0.25, side_ap_over_d: 1.0, pocket_stepover_pct: 40, adaptive_stepover_pct: 10}
+  - family: stainless_steel
+    name: Austenitic stainless steel
+    iso_group: M
+    grades:
+      - designation: "SS 304"
+        standard: "ASTM A240 / EN 1.4301"
+        equivalents: ["X5CrNi18-10"]
+        condition: "annealed"
+        hardness: "~170-200 HB"
+        density_kg_m3: 7900
+        kc11_n_mm2: 2000
+        mc: 0.21
+        cutting_data:
+          carbide: {vc_m_min: [60, 100], fz_by_d: [[3, 0.01], [6, 0.025], [10, 0.04], [16, 0.05], [20, 0.06]],
+                    drill: {vc_m_min: [40, 60], f_by_d: [[3, 0.04], [6, 0.08], [10, 0.12], [16, 0.16]]}}
+          hss: {vc_m_min: [10, 15], fz_by_d: [[3, 0.008], [6, 0.015], [10, 0.025], [16, 0.03], [20, 0.035]],
+                drill: {vc_m_min: [8, 12], f_by_d: [[3, 0.03], [6, 0.06], [10, 0.09], [16, 0.12]]}}
+          engagement: {slot_ap_over_d: 0.2, side_ap_over_d: 1.0, pocket_stepover_pct: 35, adaptive_stepover_pct: 10}
+  - family: cast_iron
+    name: Grey cast iron
+    iso_group: K
+    grades:
+      - designation: "FG 260"
+        standard: "IS 210"
+        equivalents: ["EN-GJL-250 class (indicative)"]
+        condition: "as cast"
+        hardness: "~180-230 HB"
+        density_kg_m3: 7200
+        kc11_n_mm2: 1100
+        mc: 0.28
+        cutting_data:
+          carbide: {vc_m_min: [100, 150], fz_by_d: [[3, 0.015], [6, 0.03], [10, 0.05], [16, 0.07], [20, 0.08]],
+                    drill: {vc_m_min: [60, 90], f_by_d: [[3, 0.06], [6, 0.12], [10, 0.18], [16, 0.25]]}}
+          engagement: {slot_ap_over_d: 0.3, side_ap_over_d: 1.0, pocket_stepover_pct: 40, adaptive_stepover_pct: 12}
+  - family: copper_alloy
+    name: Free-cutting brass
+    iso_group: N
+    grades:
+      - designation: "CuZn39Pb3"
+        standard: "EN 12164 CW614N"
+        equivalents: []
+        condition: "drawn"
+        hardness: "~100-150 HB"
+        density_kg_m3: 8470
+        kc11_n_mm2: 700
+        mc: 0.27
+        cutting_data:
+          carbide: {vc_m_min: [150, 300], fz_by_d: [[3, 0.02], [6, 0.04], [10, 0.06], [16, 0.08], [20, 0.09]],
+                    drill: {vc_m_min: [80, 120], f_by_d: [[3, 0.06], [6, 0.12], [10, 0.18], [16, 0.25]]}}
+          hss: {vc_m_min: [60, 90], fz_by_d: [[3, 0.015], [6, 0.03], [10, 0.045], [16, 0.06], [20, 0.07]],
+                drill: {vc_m_min: [40, 60], f_by_d: [[3, 0.05], [6, 0.10], [10, 0.15], [16, 0.20]]}}
+          engagement: {slot_ap_over_d: 0.5, side_ap_over_d: 1.0, pocket_stepover_pct: 45, adaptive_stepover_pct: 20}
+  - family: titanium_alloy
+    name: Titanium alloy
+    iso_group: S
+    grades:
+      - designation: "Ti-6Al-4V"
+        standard: "ASTM B348 Grade 5"
+        equivalents: []
+        condition: "annealed"
+        hardness: "~330 HB"
+        density_kg_m3: 4430
+        kc11_n_mm2: 1400
+        mc: 0.23
+        cutting_data:
+          carbide: {vc_m_min: [40, 60], fz_by_d: [[3, 0.01], [6, 0.02], [10, 0.035], [16, 0.045], [20, 0.05]],
+                    drill: {vc_m_min: [20, 35], f_by_d: [[3, 0.03], [6, 0.06], [10, 0.09], [16, 0.12]]}}
+          engagement: {slot_ap_over_d: 0.15, side_ap_over_d: 1.0, pocket_stepover_pct: 30, adaptive_stepover_pct: 8}
+  - family: plastic
+    name: Engineering plastic
+    iso_group: N
+    grades:
+      - designation: "POM-C (acetal copolymer)"
+        standard: ""
+        equivalents: []
+        condition: "extruded"
+        hardness: ""
+        density_kg_m3: 1410
+        cutting_data:
+          carbide: {vc_m_min: [200, 400], fz_by_d: [[3, 0.03], [6, 0.06], [10, 0.10], [16, 0.12], [20, 0.15]],
+                    drill: {vc_m_min: [50, 100], f_by_d: [[3, 0.08], [6, 0.15], [10, 0.20], [16, 0.25]]}}
+          engagement: {slot_ap_over_d: 0.6, side_ap_over_d: 1.0, pocket_stepover_pct: 50, adaptive_stepover_pct: 25}
+  - family: hardened_steel
+    name: Hardened tool steel
+    iso_group: H
+    grades:
+      - designation: "Hardened steel > 45 HRC"
+        standard: ""
+        equivalents: []
+        condition: "hardened"
+        hardness: ">45 HRC"
+        density_kg_m3: 7800
+        cutting_data: {}
+        notes: "No generic data: hard milling requires manufacturer data entered on the tool."

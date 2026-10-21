@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.egg-info/
+# Node
+node_modules/
+frontend/dist/
+# Runtime data
+backend/var/
+var/
+*.log
+.env
+# Test output
+frontend/test-results/
+frontend/playwright-report/

@@ -1,0 +1,26 @@
+# Example starter tool library. Dimensions are typical catalogue-style values for illustration; every tool must
+# be measured / checked against the actual tool in the shop before use. Created on request per organisation.
+name: "Example starter library (verify every tool)"
+description: "Illustrative tools. Replace dimensions, offsets and holder data with the shop's measured values."
+tools:
+  - {tool_number: 1, name: "D10 3F carbide flat end mill", tool_type: flat_endmill, diameter_mm: 10, cutting_length_mm: 22,
+     overall_length_mm: 72, shank_diameter_mm: 10, flute_count: 3, tool_material: carbide, coating: AlTiN,
+     length_offset_number: 1, assembly: {holder_name: "BT40 ER32 collet chuck", holder_diameter_mm: 50, holder_length_mm: 60, stick_out_mm: 35}}
+  - {tool_number: 2, name: "D6 3F carbide flat end mill", tool_type: flat_endmill, diameter_mm: 6, cutting_length_mm: 13,
+     overall_length_mm: 57, shank_diameter_mm: 6, flute_count: 3, tool_material: carbide, coating: AlTiN,
+     length_offset_number: 2, assembly: {holder_name: "BT40 ER32 collet chuck", holder_diameter_mm: 50, holder_length_mm: 60, stick_out_mm: 25}}
+  - {tool_number: 3, name: "D16 4F carbide flat end mill", tool_type: flat_endmill, diameter_mm: 16, cutting_length_mm: 32,
+     overall_length_mm: 92, shank_diameter_mm: 16, flute_count: 4, tool_material: carbide, coating: AlTiN,
+     length_offset_number: 3, assembly: {holder_name: "BT40 side-lock holder", holder_diameter_mm: 50, holder_length_mm: 70, stick_out_mm: 45}}
+  - {tool_number: 4, name: "D10 90deg spot drill", tool_type: spot_drill, diameter_mm: 10, cutting_length_mm: 20,
+     overall_length_mm: 75, shank_diameter_mm: 10, flute_count: 2, tip_angle_deg: 90, tool_material: carbide,
+     length_offset_number: 4, assembly: {holder_name: "BT40 ER32 collet chuck", holder_diameter_mm: 50, holder_length_mm: 60, stick_out_mm: 35}}
+  - {tool_number: 5, name: "D6.6 HSS jobber drill 118deg", tool_type: drill, diameter_mm: 6.6, cutting_length_mm: 63,
+     overall_length_mm: 101, shank_diameter_mm: 6.6, flute_count: 2, tip_angle_deg: 118, tool_material: hss,
+     length_offset_number: 5, assembly: {holder_name: "BT40 drill chuck", holder_diameter_mm: 50, holder_length_mm: 80, stick_out_mm: 75}}
+  - {tool_number: 6, name: "D6.8 HSS jobber drill 118deg", tool_type: drill, diameter_mm: 6.8, cutting_length_mm: 69,
+     overall_length_mm: 109, shank_diameter_mm: 6.8, flute_count: 2, tip_angle_deg: 118, tool_material: hss,
+     length_offset_number: 6, assembly: {holder_name: "BT40 drill chuck", holder_diameter_mm: 50, holder_length_mm: 80, stick_out_mm: 80}}
+  - {tool_number: 7, name: "D8 carbide drill 140deg", tool_type: drill, diameter_mm: 8, cutting_length_mm: 41,
+     overall_length_mm: 79, shank_diameter_mm: 8, flute_count: 2, tip_angle_deg: 140, tool_material: carbide,
+     length_offset_number: 7, assembly: {holder_name: "BT40 ER32 collet chuck", holder_diameter_mm: 50, holder_length_mm: 60, stick_out_mm: 50}}

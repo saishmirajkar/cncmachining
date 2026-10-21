@@ -138,6 +138,13 @@ def load_fcstd(path: Path) -> LoadedBrep:
                         b = prop.find("Bool")
                         if b is not None and b.get("value") == "true":
                             visible.add(vp.get("name"))
+        else:  # documents saved without GUI data keep an App-level Visibility property
+            for obj in doc.iter("Object"):
+                for prop in obj.iter("Property"):
+                    if prop.get("name") == "Visibility":
+                        b = prop.find("Bool")
+                        if b is not None and b.get("value") == "true" and obj.get("name"):
+                            visible.add(obj.get("name"))
         chosen = [n for n in shape_files if n in visible]
         if not chosen:
             largest = max(shape_files, key=lambda n: z.getinfo(shape_files[n]).file_size)
@@ -149,6 +156,9 @@ def load_fcstd(path: Path) -> LoadedBrep:
         for n in chosen:
             builder.Add(compound, _read_brep_bytes(z.read(shape_files[n])))
         notes.append(f"Objects used: {', '.join(chosen)}")
+        if len(chosen) > 1:
+            notes.append("Several visible objects were combined into one model; hide construction geometry in "
+                         "FreeCAD or export the intended solid as STEP if this is not the part.")
     return LoadedBrep(compound, "mm", notes)
 
 

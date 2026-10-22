@@ -6,7 +6,8 @@ FROM cnc-platform-api:latest AS worker
 
 USER root
 ARG MICROMAMBA_VERSION=2.3.0
-ARG FREECAD_SPEC="freecad=26.3"
+# conda-forge versions FreeCAD by build date: package 2026.09.16 reports itself as FreeCAD 26.3.0
+ARG FREECAD_SPEC="freecad=2026.09.16"
 RUN apt-get update && apt-get install -y --no-install-recommends curl bzip2 ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && curl -fsSL "https://conda.anaconda.org/conda-forge/linux-64/micromamba-${MICROMAMBA_VERSION}-0.tar.bz2" \

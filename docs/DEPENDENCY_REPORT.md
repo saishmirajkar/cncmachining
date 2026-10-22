@@ -27,10 +27,11 @@ Key packages: `cadquery-ocp 8.0.1.1.0` (Open CASCADE 8.0 bindings), `numpy 2.5`,
 ```bash
 curl -fsSL https://conda.anaconda.org/conda-forge/linux-64/micromamba-2.3.0-0.tar.bz2 | tar -xj bin/micromamba
 MAMBA_ROOT_PREFIX=/opt/mamba ./bin/micromamba create -y -p /opt/freecad-env -c conda-forge --override-channels \
-    freecad python=3.11
+    "freecad=2026.09.16" python=3.11
 ```
 
-Result: **FreeCAD 26.3.0** (Python 3.11.17, ~4.2 GB) with the CAM workbench (`Path.Op.*`), `libarea`, Adaptive
+Result: **FreeCAD 26.3.0** (conda-forge versions the package by build date: `freecad 2026.09.16` reports itself as
+26.3.0; `freecad=26.3` does not resolve) (Python 3.11.17, ~4.2 GB) with the CAM workbench (`Path.Op.*`), `libarea`, Adaptive
 clearing, and the new tool-bit asset system. Verified headless: `Job`, `Stock.CreateBox`, `ToolController`,
 `MillFace`, `PocketShape`, `Adaptive`, `Profile`, `Drilling`, `Helix`. OpenCAMLib (`ocl`) is not part of the
 environment, so FreeCAD's 3D Surface/Waterline operations are not usable.

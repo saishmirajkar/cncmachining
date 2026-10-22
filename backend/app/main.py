@@ -48,9 +48,10 @@ def create_app() -> FastAPI:
 
     @app.get("/api/health")
     def health() -> dict:
-        from app.services.cam.registry import engine_status
+        from app.worker.heartbeat import engine_status_for_api
 
-        return {"status": "ok", "env": s.env, "queue_backend": s.queue_backend, "cam_engines": engine_status()}
+        return {"status": "ok", "env": s.env, "queue_backend": s.queue_backend,
+                "cam_engines": engine_status_for_api()}
 
     return app
 

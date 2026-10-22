@@ -20,7 +20,7 @@ cd "$ROOT/backend"
 .venv/bin/python -m app.seed.seed
 export CNC_QUEUE_BACKEND=rq
 nohup .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 >"$LOGS/api.log" 2>&1 & echo $! >"$PIDS/api.pid"
-nohup .venv/bin/rq worker cnc --url "${CNC_REDIS_URL:-redis://localhost:6379/0}" >"$LOGS/worker.log" 2>&1 & echo $! >"$PIDS/worker.pid"
+nohup .venv/bin/python -m app.worker.run >"$LOGS/worker.log" 2>&1 & echo $! >"$PIDS/worker.pid"
 cd "$ROOT/frontend"
 nohup npx vite --host 127.0.0.1 --port 5173 >"$LOGS/web.log" 2>&1 & echo $! >"$PIDS/web.pid"
 echo "API http://127.0.0.1:8000/api/health  ·  UI http://127.0.0.1:5173"

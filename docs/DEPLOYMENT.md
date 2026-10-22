@@ -8,7 +8,7 @@
 | `redis` | redis:7 (AOF) | job queue, rate limiting |
 | `migrate` | api image | `alembic upgrade head` + idempotent catalogue seed + postprocessor fixture verification |
 | `api` | `deploy/Dockerfile.api` | FastAPI/uvicorn; never imports FreeCAD |
-| `worker` | `deploy/Dockerfile.worker` | RQ worker + FreeCAD 26.x environment; scale horizontally |
+| `worker` | `deploy/Dockerfile.worker` | `python -m app.worker.run`: RQ worker + FreeCAD 26.x environment; scale horizontally |
 | `web` | `deploy/Dockerfile.web` | nginx serving the SPA and proxying `/api` |
 
 ```bash
@@ -45,7 +45,12 @@ development secret. Relevant limits: `CNC_MAX_UPLOAD_MB`, `CNC_GEOMETRY_TIMEOUT_
 
 * JSON logs (`CNC_ENV=production`) with `request_id`, method, path, status, duration; audit events in
   `audit_events`.
-* `GET /api/health` reports queue mode and CAM-engine availability (probes FreeCAD).
+* `GET /api/health` reports queue mode and CAM-engine availability. With the `rq` backend the API does not have
+  FreeCAD; each worker probes FreeCAD itself and publishes the result to Redis every 30 s (expires after 90 s),
+  and the API reports those heartbeats. "No CAM worker has reported" means no worker is running or it cannot
+  reach the API's Redis; "Worker <host>: FreeCAD interpreter not found" means that worker's image or
+  `CNC_FREECAD_PYTHON` is wrong. Start workers with `python -m app.worker.run` (plain `rq worker` runs jobs but
+  sends no heartbeat).
 * Watch the RQ failed registry (`rq info --url …`) and jobs in `cam_failed` / `validation_failed`.
 * Error tracking (e.g. Sentry) is not integrated; add it at the ASGI middleware and RQ exception handler.
 

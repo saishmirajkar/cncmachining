@@ -19,4 +19,4 @@ ENV CNC_FREECAD_PYTHON=/opt/freecad-env/bin/python CNC_FREECAD_LIB_DIR=/opt/free
     QT_QPA_PLATFORM=offscreen
 USER cnc
 HEALTHCHECK NONE
-CMD ["rq", "worker", "cnc", "--url", "redis://redis:6379/0", "--with-scheduler"]
+CMD ["python", "-m", "app.worker.run", "--with-scheduler"]

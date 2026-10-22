@@ -104,6 +104,29 @@ def test_dxf_is_2d_only():
     assert any("2D" in lim for lim in r["limitations"])
 
 
+def test_dxf_drawing_sheet_is_flagged(tmp_path):
+    """A drawing sheet printed to DXF (A4 in inches, curves as polylines, text split into characters)."""
+    import ezdxf
+
+    doc = ezdxf.new("R12")
+    msp = doc.modelspace()
+    msp.add_polyline2d([(0.28, 0.22), (11.36, 0.22), (11.36, 8.06), (0.28, 8.06)], close=True)  # frame
+    for i in range(30):  # a "circle" flattened into a polyline, as converters do
+        msp.add_polyline2d([(3 + i * 0.1, 4), (3.1 + i * 0.1, 4.05)])
+    for i, ch in enumerate("SECTION A-A SCALE 4:1 0.2 31.5"):
+        msp.add_text(ch, dxfattribs={"insert": (1 + i * 0.12, 1), "height": 0.1})
+    path = tmp_path / "sheet.dxf"
+    doc.saveas(path)
+    r = analyze_dxf(path)
+    codes = {w["code"] for w in r["warnings"]}
+    assert {"UNITS_UNDECLARED", "DXF_DRAWING_SHEET", "DXF_CURVES_FLATTENED", "DXF_CONVERTED_DRAWING"} <= codes
+    sheet = next(w for w in r["warnings"] if w["code"] == "DXF_DRAWING_SHEET")
+    assert "A4 (in inches)" in sheet["message"]
+    # a 1:1 profile with real circles, no text and declared units raises none of them
+    plain = {w["code"] for w in analyze_dxf(FIXTURES / "plate_profile.dxf")["warnings"]}
+    assert not plain & {"DXF_DRAWING_SHEET", "DXF_CURVES_FLATTENED", "DXF_CONVERTED_DRAWING"}
+
+
 def test_fcstd_reads_visible_solid_without_freecad():
     lb = load_fcstd(FIXTURES / "plate_freecad.FCStd")
     lo, hi = bbox(lb.shape)

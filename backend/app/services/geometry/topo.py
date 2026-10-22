@@ -92,6 +92,7 @@ class FaceInfo:
     def signature(self) -> dict:
         """Geometric signature used to re-identify the face in another kernel instance (CAM runner)."""
         sig = {
+            "index": self.index,  # TopExp face index in the analysed shape (viewer highlighting only)
             "surface": self.surface,
             "area": round(self.area, 6),
             "centroid": [round(float(c), 6) for c in self.centroid],

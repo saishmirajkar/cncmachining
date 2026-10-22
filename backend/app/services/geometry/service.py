@@ -7,9 +7,10 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from app.services.geometry import brep, drawing, mesh
-from app.services.geometry.orientation import apply_to_shape, homogeneous, rotation_matrix
 from app.services.geometry.units import correction_scale
+
+# Heavy CAD/mesh libraries (OCP, trimesh, ezdxf) are imported inside the functions that need them, so that the
+# API process stays light: parsing of uploaded files happens in the isolated worker subprocess.
 
 ENGINE = "occt-ocp"
 
@@ -66,6 +67,9 @@ def analyze_file(
     orientation: str = "+Z",
     rot_z_deg: float = 0.0,
 ) -> GeometryResult:
+    from app.services.geometry import brep, drawing, mesh
+    from app.services.geometry.orientation import apply_to_shape, homogeneous, rotation_matrix
+
     if file_format in ("step", "iges", "fcstd"):
         loaded = brep.load_brep_file(path, file_format)
         declared = loaded.declared_units

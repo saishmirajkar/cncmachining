@@ -58,7 +58,9 @@ def test_geometry_analysis_from_upload(client, workflow):
 def test_full_workflow(client, workflow):
     h = workflow["h"]
     pid = workflow["project"]["id"]
-    s = client.post(f"/api/projects/{pid}/setups", json={"design_id": workflow["design"]["id"]}, headers=h).json()
+    # non-ASCII setup name: file names and HTTP headers must stay ASCII-safe
+    s = client.post(f"/api/projects/{pid}/setups", json={"design_id": workflow["design"]["id"], "name": "Setup — Fräsen"},
+                    headers=h).json()
     assert s["ready_for_planning"] is False
     fields = {r["field"] for r in s["requirements"]}
     assert {"machine_configuration", "stock", "workholding", "tool_library", "datum", "work_offset"} <= fields
@@ -157,6 +159,10 @@ def test_full_workflow(client, workflow):
     assert diff["added"] == 1 and diff["removed"] == 1
 
     exp = client.get(f"/api/program-revisions/{rev['id']}/export", headers=h)
+    assert exp.status_code == 200, exp.text
+    assert exp.headers["content-disposition"].isascii()
+    dl = client.get(f"/api/program-revisions/{rev['id']}/download", headers=h)
+    assert dl.status_code == 200 and dl.headers["x-content-sha256"] == rev["sha256"]
     z = zipfile.ZipFile(io.BytesIO(exp.content))
     names = set(z.namelist())
     assert {"setup_sheet.md", "tool_list.csv", "validation_report.json", "manifest.json",

@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/600.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens: restrained neutral palette with one engineering accent. */
+:root {
+  --background: oklch(0.985 0.002 250);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.97 0.003 250);
+  --foreground: oklch(0.22 0.015 255);
+  --muted: oklch(0.52 0.015 255);
+  --border: oklch(0.91 0.005 255);
+  --border-strong: oklch(0.84 0.008 255);
+  --accent: oklch(0.55 0.13 235);
+  --accent-fg: oklch(0.99 0 0);
+  --accent-soft: oklch(0.95 0.03 235);
+  --ok: oklch(0.56 0.13 155);
+  --ok-soft: oklch(0.95 0.04 155);
+  --warn: oklch(0.62 0.14 70);
+  --warn-soft: oklch(0.96 0.05 85);
+  --err: oklch(0.55 0.19 25);
+  --err-soft: oklch(0.95 0.035 25);
+  --info: oklch(0.55 0.08 250);
+  --info-soft: oklch(0.95 0.02 250);
+  --sidebar: oklch(0.2 0.018 255);
+  --sidebar-fg: oklch(0.86 0.01 255);
+  --sidebar-active: oklch(0.28 0.025 255);
+  --viewport: oklch(0.2 0.012 255);
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-err: var(--err);
+  --color-err-soft: var(--err-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-viewport: var(--viewport);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01", "tnum";
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* CodeMirror G-code theme hooks */
+.cm-editor {
+  height: 100%;
+  font-size: 12.5px;
+}
+.cm-editor .cm-scroller {
+  font-family: var(--font-mono);
+}
+.cm-gcode-error-line {
+  background: color-mix(in oklch, var(--err) 12%, transparent);
+}
+.cm-gcode-warn-line {
+  background: color-mix(in oklch, var(--warn) 12%, transparent);
+}
+.cm-gcode-op-line {
+  background: color-mix(in oklch, var(--accent) 9%, transparent);
+}
+.cm-gcode-active-line {
+  outline: 1px solid color-mix(in oklch, var(--accent) 60%, transparent);
+}

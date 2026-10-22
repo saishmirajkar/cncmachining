@@ -37,6 +37,22 @@ class ProgramError(ValueError):
     pass
 
 
+def safe_filename(name: str) -> str:
+    """ASCII-only file name (controllers, USB/DNC transfer tools and HTTP headers reject other characters)."""
+    import re
+    import unicodedata
+
+    ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    ascii_name = re.sub(r"[^A-Za-z0-9._-]+", "_", ascii_name).strip("._")
+    return re.sub(r"_+", "_", ascii_name)[:120] or "program"
+
+
+def content_disposition(filename: str) -> str:
+    from urllib.parse import quote
+
+    return f"attachment; filename=\"{safe_filename(filename)}\"; filename*=UTF-8''{quote(filename)}"
+
+
 def _program_name(snap: dict) -> str:
     base = Path(snap["design"]["filename"]).stem.upper()
     return f"{base} {snap['setup']['name']}".strip()[:60]
@@ -245,7 +261,7 @@ def export_bundle(db: Session, prog: GeneratedProgram, rev: ProgramRevision) -> 
     snap = job.input_snapshot
     gates, report, review = gates_for(db, rev)
     released = rev.released
-    base = f"{prog.program_name.replace(' ', '_')}_R{rev.revision_number}"
+    base = safe_filename(f"{prog.program_name}_R{rev.revision_number}")
     nc_name = base + ("" if released else "_UNRELEASED") + rev.file_extension
     manifest = {
         "format": "cnc-export/1", "exported_at": utcnow().isoformat(),

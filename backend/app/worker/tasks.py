@@ -63,7 +63,8 @@ def analyze_design(analysis_id: str) -> None:
         an.duration_ms = int((time.perf_counter() - t0) * 1000)
         if design.detected_units is None and r["declared_units"]:
             design.detected_units = r["declared_units"]
-        design.mesh_storage_key = storage.put_bytes(mesh_to_json_bytes(r["mesh"]), f"orgs/{design.organization_id}/meshes", ".json")
+        an.mesh_storage_key = storage.put_bytes(mesh_to_json_bytes(r["mesh"]), f"orgs/{design.organization_id}/meshes", ".json")
+        design.mesh_storage_key = an.mesh_storage_key
         if r["normalized_step_b64"]:
             design.normalized_storage_key = storage.put_bytes(
                 base64.b64decode(r["normalized_step_b64"]), f"orgs/{design.organization_id}/normalized", ".step")

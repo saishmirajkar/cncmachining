@@ -24,7 +24,15 @@ from app.models import (
 from app.models.base import JobStatus, Role, utcnow
 from app.services import audit
 from app.services.lifecycle import REQUIRED_ACKNOWLEDGEMENTS
-from app.services.programs import ProgramError, create_manual_revision, export_bundle, gates_for, run_validation
+from app.services.programs import (
+    ProgramError,
+    content_disposition,
+    create_manual_revision,
+    export_bundle,
+    gates_for,
+    run_validation,
+    safe_filename,
+)
 from app.services.storage import get_storage
 
 router = APIRouter(prefix="/api", tags=["programs"])
@@ -117,12 +125,12 @@ def get_revision(rev_id: uuid.UUID, ctx: OrgContext = Depends(get_org_context)) 
 @router.get("/program-revisions/{rev_id}/download")
 def download_revision(rev_id: uuid.UUID, ctx: OrgContext = Depends(get_org_context)) -> Response:
     rev, prog = _revision(ctx, rev_id)
-    name = f"{prog.program_name.replace(' ', '_')}_R{rev.revision_number}{'' if rev.released else '_UNRELEASED'}{rev.file_extension}"
+    name = safe_filename(f"{prog.program_name}_R{rev.revision_number}{'' if rev.released else '_UNRELEASED'}") + rev.file_extension
     audit.record(ctx.db, "program.downloaded", "program_revision", rev.id, organization_id=ctx.org_id,
                  user_id=ctx.user.id, details={"released": rev.released})
     ctx.db.commit()
     return Response(rev.content, media_type="text/plain",
-                    headers={"Content-Disposition": f'attachment; filename="{name}"', "X-Content-SHA256": rev.sha256})
+                    headers={"Content-Disposition": content_disposition(name), "X-Content-SHA256": rev.sha256})
 
 
 @router.get("/program-revisions/{rev_id}/export")
@@ -132,7 +140,7 @@ def export_revision(rev_id: uuid.UUID, ctx: OrgContext = Depends(get_org_context
     audit.record(ctx.db, "program.exported", "program_revision", rev.id, organization_id=ctx.org_id,
                  user_id=ctx.user.id, details={"released": rev.released, "bundle": name})
     ctx.db.commit()
-    return Response(data, media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{name}"'})
+    return Response(data, media_type="application/zip", headers={"Content-Disposition": content_disposition(name)})
 
 
 @router.get("/program-revisions/{rev_id}/simulation")
@@ -150,6 +158,7 @@ def get_simulation(rev_id: uuid.UUID, ctx: OrgContext = Depends(get_org_context)
             "stock_wcs": job.input_snapshot["stock_wcs"], "part_wcs": job.input_snapshot["part_wcs"],
             "wcs_matrix": job.input_snapshot["wcs_matrix"], "keep_out_boxes": job.input_snapshot.get("keep_out_boxes", []),
             "operations": rev.operation_map, "design_id": job.input_snapshot["design"]["id"],
+            "analysis_id": job.input_snapshot["geometry"]["analysis_id"],
             "tools": [{"number": t["tool_number"], "name": t["name"], "diameter": t["diameter_mm"],
                        "type": t["tool_type"]} for t in job.input_snapshot["tools"]]}
 

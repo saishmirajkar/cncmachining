@@ -207,11 +207,20 @@ def get_analysis(design_id: uuid.UUID, analysis_id: uuid.UUID, ctx: OrgContext =
 
 
 @router.get("/api/designs/{design_id}/mesh")
-def get_mesh(design_id: uuid.UUID, ctx: OrgContext = Depends(get_org_context)) -> Response:
+def get_mesh(design_id: uuid.UUID, ctx: OrgContext = Depends(get_org_context),
+             analysis_id: uuid.UUID | None = None) -> Response:
+    """Preview mesh of the latest analysis, or of a specific analysis (its orientation frame)."""
     d = ctx.get_owned(UploadedDesign, design_id)
-    if not d.mesh_storage_key:
+    key = d.mesh_storage_key
+    if analysis_id:
+        an = ctx.db.get(GeometryAnalysis, analysis_id)
+        if an is None or an.design_id != d.id:
+            raise HTTPException(404, "Analysis not found")
+        key = an.mesh_storage_key
+    if not key:
         raise HTTPException(404, "No preview mesh available")
-    return Response(get_storage().read_bytes(d.mesh_storage_key), media_type="application/json")
+    return Response(get_storage().read_bytes(key), media_type="application/json",
+                    headers={"Cache-Control": "private, max-age=3600"})
 
 
 @router.get("/api/designs/{design_id}/download")

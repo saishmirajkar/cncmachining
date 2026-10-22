@@ -55,6 +55,7 @@ class GeometryAnalysis(IdMixin, TimestampMixin, Base):
     warnings: Mapped[list] = mapped_column(JSONType, default=list)
     limitations: Mapped[list] = mapped_column(JSONType, default=list)
     error: Mapped[str] = mapped_column(Text, default="")
+    mesh_storage_key: Mapped[str | None] = mapped_column(String(400), nullable=True)
     duration_ms: Mapped[int] = mapped_column(Integer, default=0)
 
     design: Mapped[UploadedDesign] = relationship(back_populates="analyses")

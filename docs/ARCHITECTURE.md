@@ -165,7 +165,7 @@ refuses `machine_verified` without a reviewer and machine-configuration referenc
 
 ## 9. Front end (`frontend/`)
 
-React 18 + TypeScript + Vite, Tailwind CSS with shadcn/ui-style components (Radix primitives), React Router,
+React 19 + TypeScript + Vite 8, Tailwind CSS 4 with shadcn/ui-style components (Radix primitives), React Router,
 TanStack Query, React Three Fiber for the 3D workspace (part mesh, stock, axes, work origin, feature highlight,
 toolpath lines, simulated stock height-field, playback), CodeMirror 6 for the G-code viewer (custom G-code
 highlighting, search, line annotations, operation markers).

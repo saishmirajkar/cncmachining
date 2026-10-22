@@ -1,0 +1,22 @@
+# CAM worker image: the API code base + a separate FreeCAD 26.x environment (conda-forge) used only through
+# the freecad_runner subprocess. FreeCAD is never imported into the API/worker Python process.
+# NOTE: not build-tested in the development container (no Docker daemon); the commands mirror the verified
+# installation in docs/DEPENDENCY_REPORT.md.
+FROM cnc-platform-api:latest AS worker
+
+USER root
+ARG MICROMAMBA_VERSION=2.3.0
+ARG FREECAD_SPEC="freecad=26.3"
+RUN apt-get update && apt-get install -y --no-install-recommends curl bzip2 ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL "https://conda.anaconda.org/conda-forge/linux-64/micromamba-${MICROMAMBA_VERSION}-0.tar.bz2" \
+       | tar -xj -C /usr/local bin/micromamba \
+    && MAMBA_ROOT_PREFIX=/opt/mamba micromamba create -y -p /opt/freecad-env -c conda-forge --override-channels \
+       "${FREECAD_SPEC}" python=3.11 \
+    && micromamba clean -a -y && rm -rf /opt/mamba/pkgs
+
+ENV CNC_FREECAD_PYTHON=/opt/freecad-env/bin/python CNC_FREECAD_LIB_DIR=/opt/freecad-env/lib \
+    QT_QPA_PLATFORM=offscreen
+USER cnc
+HEALTHCHECK NONE
+CMD ["rq", "worker", "cnc", "--url", "redis://redis:6379/0", "--with-scheduler"]

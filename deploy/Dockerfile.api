@@ -1,0 +1,24 @@
+# API image: FastAPI + OCCT (OCP) geometry. Also the base of the worker image.
+# NOTE: written from the verified bare-metal setup (docs/DEPENDENCY_REPORT.md); not build-tested in the
+# development container used for this repository (no Docker daemon available there).
+FROM python:3.13-slim-bookworm AS api
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+
+# runtime libraries required by the OCP (Open CASCADE) wheels and VTK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 libglu1-mesa libxrender1 libxext6 libxi6 libsm6 libfontconfig1 libxkbcommon0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd --system --uid 10001 --create-home cnc
+WORKDIR /app
+COPY backend/requirements.lock.txt ./
+RUN pip install -r requirements.lock.txt
+COPY backend/ ./
+RUN mkdir -p /data/storage /data/tmp && chown -R cnc /data /app
+
+USER cnc
+ENV CNC_STORAGE_DIR=/data/storage CNC_TEMP_DIR=/data/tmp CNC_QUEUE_BACKEND=rq
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=4)" || exit 1
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2", "--proxy-headers"]

@@ -22,6 +22,18 @@ class IsolatedTaskError(RuntimeError):
     pass
 
 
+# Variables the child needs to start Python and load native libraries. Library search paths matter where system
+# libraries live outside the default locations (e.g. Nix: OCP's libGL.so.1 is found only via LD_LIBRARY_PATH).
+_PASS_ENV = ("PATH", "HOME", "LANG", "LC_ALL", "TMPDIR", "PYTHONUSERBASE", "LD_LIBRARY_PATH",
+             "REPLIT_LD_LIBRARY_PATH", "NIX_LD", "NIX_LD_LIBRARY_PATH")
+
+
+def child_env() -> dict[str, str]:
+    env = {k: v for k, v in os.environ.items() if k in _PASS_ENV or k.startswith("CNC_")}
+    env["PYTHONPATH"] = os.pathsep.join(p for p in (str(BACKEND_DIR), os.environ.get("PYTHONPATH", "")) if p)
+    return env
+
+
 def _limit(cpu_s: int, mem_mb: int) -> None:
     resource.setrlimit(resource.RLIMIT_CPU, (cpu_s, cpu_s + 5))
     if mem_mb > 0:
@@ -34,8 +46,7 @@ def run_isolated(kind: str, request: dict, timeout_s: int, mem_mb: int = 4096) -
         req = Path(td) / "request.json"
         res = Path(td) / "result.json"
         req.write_text(json.dumps(request))
-        env = {k: v for k, v in os.environ.items() if k in ("PATH", "HOME", "LANG", "PYTHONPATH") or k.startswith("CNC_")}
-        env["PYTHONPATH"] = str(BACKEND_DIR)
+        env = child_env()
         try:
             proc = subprocess.run(
                 [sys.executable, "-m", "app.worker.isolated", kind, str(req), str(res)],

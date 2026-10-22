@@ -1,6 +1,7 @@
 """The API reports CAM availability from worker heartbeats, not from its own (FreeCAD-less) environment."""
 
 import json
+import os
 
 from app.worker import heartbeat
 
@@ -50,3 +51,17 @@ def test_redis_down_is_reported(monkeypatch):
     monkeypatch.setattr(heartbeat, "_redis", boom)
     [e] = heartbeat.reported_status()
     assert e["available"] is False and "Redis error" in e["detail"]
+
+
+def test_isolated_child_keeps_library_search_path(monkeypatch):
+    """Geometry analysis runs in a child process; on Nix-based hosts OCP finds libGL only via LD_LIBRARY_PATH."""
+    from app.core.config import BACKEND_DIR
+    from app.worker.isolated import child_env
+
+    monkeypatch.setenv("LD_LIBRARY_PATH", "/nix/store/x-libGL/lib")
+    monkeypatch.setenv("PYTHONPATH", "/extra/site")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "do-not-pass")
+    env = child_env()
+    assert env["LD_LIBRARY_PATH"] == "/nix/store/x-libGL/lib"
+    assert env["PYTHONPATH"].split(os.pathsep) == [str(BACKEND_DIR), "/extra/site"]
+    assert "AWS_SECRET_ACCESS_KEY" not in env

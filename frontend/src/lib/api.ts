@@ -1,4 +1,5 @@
 /** Thin API client: bearer token + organisation header, structured errors. */
+import { PREVIEW, previewMe, previewResponse, READ_ONLY_MESSAGE } from "./preview";
 
 const TOKEN_KEY = "cnc.token";
 const ORG_KEY = "cnc.org";
@@ -22,16 +23,16 @@ function safeSet(key: string, value: string | null) {
 
 export const session = {
   get token() {
-    return safeGet(TOKEN_KEY);
+    return PREVIEW ? previewMe().token : safeGet(TOKEN_KEY);
   },
   set token(v: string | null) {
-    safeSet(TOKEN_KEY, v);
+    if (!PREVIEW) safeSet(TOKEN_KEY, v);
   },
   get org() {
-    return safeGet(ORG_KEY);
+    return PREVIEW ? previewMe().org : safeGet(ORG_KEY);
   },
   set org(v: string | null) {
-    safeSet(ORG_KEY, v);
+    if (!PREVIEW) safeSet(ORG_KEY, v);
   },
 };
 
@@ -64,6 +65,7 @@ export function headers(extra: Record<string, string> = {}): Record<string, stri
 
 export async function api<T = unknown>(path: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {
   const { json, ...rest } = init;
+  if (PREVIEW) return previewResponse(path, (rest.method ?? "GET").toUpperCase()) as T;
   const res = await fetch(path, {
     ...rest,
     headers: headers(json !== undefined ? { "Content-Type": "application/json" } : {}),
@@ -88,6 +90,7 @@ export async function api<T = unknown>(path: string, init: RequestInit & { json?
 
 /** Authenticated download that saves the response as a file. */
 export async function download(path: string, fallbackName: string) {
+  if (PREVIEW) throw new ApiError(403, "Downloads are disabled in the read-only preview.");
   const res = await fetch(path, { headers: headers() });
   if (!res.ok) throw new ApiError(res.status, (await res.json().catch(() => ({}))).detail ?? res.statusText);
   const blob = await res.blob();
@@ -109,6 +112,7 @@ export function uploadWithProgress(
   form: FormData,
   onProgress: (fraction: number) => void,
 ): { promise: Promise<unknown>; cancel: () => void } {
+  if (PREVIEW) return { promise: Promise.reject(new ApiError(403, READ_ONLY_MESSAGE)), cancel: () => undefined };
   const xhr = new XMLHttpRequest();
   const promise = new Promise<unknown>((resolve, reject) => {
     xhr.open("POST", path);

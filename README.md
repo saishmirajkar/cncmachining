@@ -115,3 +115,4 @@ FreeCAD-dependent tests are skipped automatically when the CAM runtime is not av
 * [Postprocessors](docs/POSTPROCESSORS.md) – configuration schema, verification, adding a controller
 * [Catalogue format](docs/CATALOGUE_FORMAT.md) – machine/controller import/export
 * [Deployment](docs/DEPLOYMENT.md) – containers, operations, backups
+* [Read-only preview](docs/PREVIEW.md) – static build that replays a recorded run (no backend)

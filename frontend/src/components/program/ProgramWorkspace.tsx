@@ -59,7 +59,7 @@ export function ProgramWorkspace({ programId, initialRevisionId, defaultTab = "p
       <Card>
         <CardContent className="flex flex-wrap items-center justify-between gap-4 pt-4">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-base font-semibold">
+            <div className="flex flex-wrap items-center gap-2 text-base font-semibold">
               {p.program_name} <JobStatusBadge status={r?.status ?? p.status} />
               {r?.released && <Badge tone="ok">Released</Badge>}
             </div>

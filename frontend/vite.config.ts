@@ -4,6 +4,8 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  // The read-only preview (VITE_PREVIEW=1) is served from an arbitrary static path, so assets are relative.
+  base: process.env.VITE_PREVIEW === "1" ? "./" : "/",
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
   server: {

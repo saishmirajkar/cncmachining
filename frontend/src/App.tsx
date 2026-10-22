@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { Spinner, TooltipProvider } from "@/components/ui/misc";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { PREVIEW } from "@/lib/preview";
 import { AuthPage } from "@/pages/AuthPage";
 import { Dashboard } from "@/pages/Dashboard";
 import { History, JobDetail, ProgramPage, Reports, RevisionPage } from "@/pages/History";
@@ -11,6 +12,9 @@ import { Machines } from "@/pages/Machines";
 import { ProjectDetail, Projects } from "@/pages/Projects";
 import { Settings } from "@/pages/Settings";
 import { WizardDesign, WizardNew, WizardSetup } from "@/pages/wizard/Wizard";
+
+// The preview is served from a static location without server-side routing, so it uses hash URLs.
+const Router = PREVIEW ? HashRouter : BrowserRouter;
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
@@ -31,7 +35,7 @@ export default function App() {
     <QueryClientProvider client={qc}>
       <AuthProvider>
         <TooltipProvider>
-          <BrowserRouter>
+          <Router>
             <Routes>
               <Route path="/login" element={<AuthPage />} />
               <Route element={<Protected />}>
@@ -54,7 +58,7 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Routes>
-          </BrowserRouter>
+          </Router>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

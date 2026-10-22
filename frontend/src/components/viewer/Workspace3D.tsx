@@ -1,4 +1,4 @@
-import { GizmoHelper, GizmoViewport, Html, OrbitControls } from "@react-three/drei";
+import { GizmoHelper, GizmoViewport, OrbitControls } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -150,6 +150,38 @@ function BoxOutline({ box, color, fill, opacity = 0.08 }: { box: Box3; color: st
   );
 }
 
+/** Screen-sized text label drawn to a canvas texture (no DOM overlay, no font download). */
+function Label({ text, position, color = "#ffffff", anchor = "center" }: { text: string; position: [number, number, number]; color?: string; anchor?: "center" | "left" }) {
+  const { texture, aspect } = useMemo(() => {
+    const scale = 4;
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d")!;
+    const font = `600 ${11 * scale}px "JetBrains Mono", ui-monospace, monospace`;
+    ctx.font = font;
+    const pad = 4 * scale;
+    c.width = Math.ceil(ctx.measureText(text).width + pad * 2);
+    c.height = 18 * scale;
+    ctx.font = font;
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.beginPath();
+    ctx.roundRect(0, 0, c.width, c.height, 3 * scale);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, pad, c.height / 2 + scale);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return { texture: t, aspect: c.width / c.height };
+  }, [text, color]);
+  useEffect(() => () => texture.dispose(), [texture]);
+  const h = 0.035; // fraction of the viewport height (sizeAttenuation off)
+  return (
+    <sprite position={position} scale={[h * aspect, h, 1]} center={anchor === "left" ? new THREE.Vector2(-0.1, 0.5) : new THREE.Vector2(0.5, 0.5)} renderOrder={10}>
+      <spriteMaterial map={texture} sizeAttenuation={false} depthTest={false} transparent />
+    </sprite>
+  );
+}
+
 function OriginTriad({ size }: { size: number }) {
   const axes: [string, [number, number, number], string][] = [
     ["X", [size, 0, 0], "#ef4444"],
@@ -165,17 +197,11 @@ function OriginTriad({ size }: { size: number }) {
             <lineSegments geometry={g}>
               <lineBasicMaterial color={color} linewidth={2} />
             </lineSegments>
-            <Html position={end} center style={{ pointerEvents: "none" }}>
-              <span className="rounded bg-black/60 px-1 font-mono text-[10px] font-semibold" style={{ color }}>
-                {name}
-              </span>
-            </Html>
+            <Label text={name} position={end} color={color} />
           </group>
         );
       })}
-      <Html position={[0, 0, 0]} style={{ pointerEvents: "none" }}>
-        <span className="ml-1 rounded bg-black/60 px-1 font-mono text-[10px] text-white">WCS 0,0,0</span>
-      </Html>
+      <Label text="WCS 0,0,0" position={[0, 0, 0]} anchor="left" />
     </group>
   );
 }

@@ -68,6 +68,11 @@ body,
   height: 100%;
 }
 
+/* Grid cells may shrink below their content width (long tables and labels scroll or truncate inside them). */
+.grid > * {
+  min-width: 0;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

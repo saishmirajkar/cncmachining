@@ -104,7 +104,7 @@ export function Td({ className, ...p }: React.TdHTMLAttributes<HTMLTableCellElem
 /* ---------------------------------------------------------------- Tabs */
 export const Tabs = TabsPrimitive.Root;
 export function TabsList({ className, ...p }: React.ComponentProps<typeof TabsPrimitive.List>) {
-  return <TabsPrimitive.List className={cn("inline-flex h-9 items-center gap-1 border-b border-border", className)} {...p} />;
+  return <TabsPrimitive.List className={cn("inline-flex h-9 max-w-full items-center gap-1 overflow-x-auto overflow-y-hidden border-b border-border", className)} {...p} />;
 }
 export function TabsTrigger({ className, ...p }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (

@@ -1,8 +1,46 @@
 import { expect, test, type Page } from "@playwright/test";
+import fs from "node:fs";
 import path from "node:path";
 
 const FIXTURE = path.resolve(import.meta.dirname, "../../backend/tests/fixtures/pocketed_part.step");
 const SHOTS = process.env.E2E_SCREENSHOTS;
+/** When set, every successful GET /api response seen by the first user is written to this JSON file
+ *  (used to build the read-only preview, see docs/PREVIEW.md). */
+const RECORD = process.env.RECORD_PREVIEW;
+type Recorded = Record<string, { contentType: string; body: unknown }>;
+
+function recordResponses(page: Page, into: Recorded) {
+  page.on("response", async (res) => {
+    const url = new URL(res.url());
+    if (!url.pathname.startsWith("/api/") || res.request().method() !== "GET" || res.status() !== 200) return;
+    const contentType = res.headers()["content-type"] ?? "";
+    if (!/json|text/.test(contentType)) return; // export bundles (zip) are not part of the preview
+    try {
+      into[url.pathname + url.search] = { contentType, body: contentType.includes("json") ? await res.json() : await res.text() };
+    } catch {
+      /* response body no longer available (navigation) */
+    }
+  });
+}
+
+/** Visit every in-app page reachable from the navigation (and every tab on it) so its data is recorded. */
+async function crawl(page: Page, extra: string[]) {
+  const seen = new Set<string>();
+  const queue = ["/", ...extra];
+  while (queue.length && seen.size < 120) {
+    const target = queue.shift()!;
+    if (seen.has(target) || target.startsWith("/login")) continue;
+    seen.add(target);
+    await page.goto(target);
+    await page.waitForLoadState("networkidle");
+    for (const tab of await page.getByRole("tab").all()) {
+      await tab.click().catch(() => undefined);
+      await page.waitForLoadState("networkidle");
+    }
+    const hrefs = await page.locator("a[href^='/']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
+    for (const h of hrefs) if (!seen.has(h)) queue.push(h);
+  }
+}
 
 async function shot(page: Page, name: string) {
   if (SHOTS) await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: false });
@@ -21,12 +59,14 @@ async function register(page: Page, email: string, org: string) {
 test("complete STEP-to-program workflow through the UI", async ({ page, browser }) => {
   const stamp = Date.now();
   const email = `programmer-${stamp}@example.com`;
-  await register(page, email, `E2E Shop ${stamp}`);
+  const recorded: Recorded = {};
+  if (RECORD) recordResponses(page, recorded);
+  await register(page, email, RECORD ? "Demo machine shop" : `E2E Shop ${stamp}`);
   await shot(page, "01-dashboard-empty");
 
   // 1. upload
   await page.getByRole("link", { name: "New CNC Job", exact: true }).click();
-  await page.getByTestId("new-project-name").fill("E2E bracket");
+  await page.getByTestId("new-project-name").fill(RECORD ? "Pocketed bracket (demo)" : "E2E bracket");
   await page.getByRole("button", { name: "Create", exact: true }).click();
   await page.getByTestId("file-input").setInputFiles(FIXTURE);
 
@@ -137,4 +177,11 @@ test("complete STEP-to-program workflow through the UI", async ({ page, browser 
   await expect(p2.getByText("Released for controlled prove-out")).toBeVisible();
   await shot(p2, "10-released");
   await ctx2.close();
+
+  if (RECORD) {
+    const setupId = /\/jobs\/([^/]+)\//.exec(url)![1];
+    const steps = ["geometry", "machine", "stock", "tooling", "plan", "cam", "validate", "export"];
+    await crawl(page, steps.map((s) => `/jobs/${setupId}/${s}`));
+    fs.writeFileSync(RECORD, JSON.stringify({ recorded_at: new Date().toISOString(), start: `/jobs/${setupId}/export`, responses: recorded }));
+  }
 });

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:preview": "tsc -b && VITE_PREVIEW=1 vite build --outDir dist-preview && cp preview/preview-data.json dist-preview/",
     "lint": "oxlint",
     "preview": "vite preview"
   },

@@ -96,7 +96,13 @@ export function Settings() {
                   ["API", health.data?.status],
                   ["Environment", health.data?.env],
                   ["Job queue", health.data?.queue_backend],
-                  ...((health.data?.cam_engines ?? []).map((e: any) => [`CAM engine ${e.name}`, `${e.available ? "available" : "UNAVAILABLE"} — ${e.detail}`]) as [string, string][]),
+                  ...((health.data?.cam_engines ?? []).map((e: any) => [
+                    `CAM engine ${e.name}`,
+                    // full diagnostic text: this is what an administrator needs to fix the worker
+                    <span className="block whitespace-pre-wrap break-words" data-testid="cam-engine-detail">
+                      {`${e.available ? "available" : "UNAVAILABLE"} — ${e.detail}`}
+                    </span>,
+                  ]) as [string, React.ReactNode][]),
                 ]}
               />
             </CardContent>

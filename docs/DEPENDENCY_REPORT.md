@@ -22,6 +22,11 @@ Key packages: `cadquery-ocp 8.0.1.1.0` (Open CASCADE 8.0 bindings), `numpy 2.5`,
 `pyclipper 1.4`, `trimesh 5.1.1`, `ezdxf 1.4.5`, `fastapi 0.158`, `sqlalchemy 2.1`, `alembic 1.20`,
 `psycopg 3.3`, `rq 2.12`, `redis 8.1`.
 
+**System libraries for the API/worker environment**: the `cadquery-ocp` wheel links `libGL.so.1`, `libGLX.so.0`,
+`libGLdispatch.so.0`, `libX11.so.6` and `libxcb.so.1` even for headless use (Debian/Ubuntu: `libgl1`, which pulls the
+others; Nix: `libGL`, `libglvnd`, `xorg.libX11`, `xorg.libxcb` plus `LD_LIBRARY_PATH`). Without them every STEP/IGES
+analysis fails with `ImportError: libGL.so.1`.
+
 **FreeCAD CAM runtime** (separate interpreter, never imported by the web process):
 
 ```bash
